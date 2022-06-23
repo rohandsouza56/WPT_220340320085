@@ -1,0 +1,113 @@
+<html>
+  <head>
+    <style>
+      body {
+        background-color: rgb(255, 254, 253);
+      }
+
+      .main {
+        background-color: azure;
+        padding: 30px;
+      }
+      .button {
+        padding: 5px 10px 5px 10px;
+        background-color: rgb(112, 255, 145);
+        border-radius: 10px;
+        width: 20%;
+        margin-left: 60px;
+        cursor: pointer;
+      }
+
+      #bookid {
+        margin-left: 65px;
+        padding: 10px;
+        margin-bottom: 20px;
+        background-color: rgb(247, 248, 182);
+      }
+      #bookname {
+        margin-left: 40px;
+        padding: 10px;
+        margin-bottom: 20px;
+        background-color: rgb(247, 248, 182);
+      }
+      #bookprice {
+        margin-left: 45px;
+        padding: 10px;
+        margin-bottom: 20px;
+        background-color: rgb(247, 248, 182);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <br />Book Id <input id="bookid" type="text" name="bookid" /><span
+        id="msg"
+      ></span>
+      <br />Book Name <input id="bookname" type="text" name="bookname" />
+      <br />Book Price
+      <input id="bookprice" type="text" name="bookprice" /><br /><br />
+      <input
+        id="updateButton"
+        class="button"
+        type="submit"
+        value="Update Book"
+      />
+    </div>
+  </body>
+
+  <script src="jquery-3.5.1.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $("#bookid").blur(function () {
+        let input = { bookid: $("#bookid").val() };
+        $.ajax({
+          type: "get",
+          dataType: "json",
+          url: "http://localhost:8081/getBook",
+          data: input,
+          success: function (data) {
+            //console.log(data);
+            if (data.status) {
+              $("#bookname").val(data.bookDetails.bookname);
+              $("#bookprice").val(data.bookDetails.price);
+              $("#msg").text("Book Found");
+            } else {
+              $("#bookname").val("");
+              $("#bookprice").val("");
+              $("#msg").text("Book not Found");
+            }
+          },
+          error: function (e) {
+            alert("Error " + JSON.stringify(e));
+          },
+        });
+      });
+
+      $("#updateButton").click(function () {
+        if ($("#bookid").val() != "" && $("#bookprice").val() != "") {
+          let input = {
+            bookid: $("#bookid").val(),
+            bookprice: $("#bookprice").val(),
+          };
+          $.ajax({
+            type: "get",
+            dataType: "json",
+            url: "http://localhost:8081/updateBook",
+            data: input,
+            success: function (data) {
+              //console.log(data);
+              if (data) {
+                $("#msg").text("Book Price Updated");
+              }
+            },
+            error: function (e) {
+              alert("Error in updating book price " + JSON.stringify(e));
+            },
+          });
+        } else {
+          $("#msg").text("Please enter book id and price for update");
+        }
+      });
+    });
+  </script>
+</html>
